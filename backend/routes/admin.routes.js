@@ -26,4 +26,19 @@ router.put('/users/:userId/make-admin', adminController.makeAdmin);
 // Remove admin privileges
 router.put('/users/:userId/remove-admin', adminController.removeAdmin);
 
+// Get all rides
+router.get('/rides', adminController.getAllRides);
+
+// Delete a ride
+router.delete('/rides/:rideId', adminController.deleteRide);
+
+// Get all messages
+router.get('/messages', adminController.getAllMessages);
+
+// Delete a message
+router.delete('/messages/:messageId', adminController.deleteMessage);
+
+// Get admin profile
+router.get('/profile', adminController.getAdminProfile);
+
 module.exports = router;

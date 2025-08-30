@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useEffect } from 'react';
+import "./LoginForm.css";
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -8,6 +9,7 @@ const LoginForm = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isAdminMode, setIsAdminMode] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -42,13 +44,21 @@ const LoginForm = () => {
             localStorage.setItem('token', json.token);
             localStorage.setItem('user', JSON.stringify(json.user));
 
+            console.log('Login successful:', json);
+            console.log('User role:', json.user.role);
+            console.log('Redirecting to:', json.user.role === 'admin' ? '/admin' : '/home');
+
             // Clear form
             setEmail('');
             setPassword('');
             setError(null);
 
-            // Redirect to home
-            navigate('/home');
+            // Redirect based on user role
+            if (json.user.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             setError(err.message || "An error occurred during login");
         } finally {
@@ -62,41 +72,89 @@ const LoginForm = () => {
 
     return (
         <div className="login-container">
-            <form className="login" onSubmit={handleSubmit}>
-                <h3>Login</h3>
-
-                {error && <div className="error">{error}</div>}    
-
-                <div className="form-group">
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        onChange={(e) => setEmail(e.target.value)}
-                        value={email}
-                        required
-                        disabled={isLoading}
-                    />    
+            <div className="login-card">
+                <div className="login-header">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to your account</p>
                 </div>
 
-                <div className="form-group">
-                    <label>Password:</label>
-                    <input
-                        type="password"  
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password}
-                        required
-                        disabled={isLoading}
-                    />
+                <div className="mode-toggle">
+                    <button 
+                        className={`toggle-btn ${!isAdminMode ? 'active' : ''}`}
+                        onClick={() => setIsAdminMode(false)}
+                    >
+                        <span className="icon">👤</span>
+                        User Login
+                    </button>
+                    <button 
+                        className={`toggle-btn ${isAdminMode ? 'active' : ''}`}
+                        onClick={() => setIsAdminMode(true)}
+                    >
+                        <span className="icon">👨‍💼</span>
+                        Admin Login
+                    </button>
                 </div>
 
-                <button 
-                    className="login-button" 
-                    type="submit"
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
+                {error && (
+                    <div className="error-message">
+                        <span className="error-icon">⚠️</span>
+                        {error}
+                    </div>
+                )}
+
+                <form className="login-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Email Address</label>
+                        <input
+                            type="email"
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            required
+                            disabled={isLoading}
+                            placeholder="Enter your email"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            required
+                            disabled={isLoading}
+                            placeholder="Enter your password"
+                        />
+                    </div>
+
+                    <button 
+                        className="login-button" 
+                        type="submit"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <span className="loading-spinner"></span>
+                        ) : (
+                            <>
+                                <span className="btn-icon">🔐</span>
+                                {isAdminMode ? 'Admin Login' : 'User Login'}
+                            </>
+                        )}
+                    </button>
+                </form>
+
+                <div className="login-footer">
+                    <p>
+                        Don't have an account? 
+                        <button 
+                            className="link-button"
+                            onClick={() => navigate('/register')}
+                        >
+                            Sign up here
+                        </button>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };

@@ -142,3 +142,106 @@ exports.removeAdmin = async (req, res) => {
         res.status(500).json({ message: "Failed to update user role", error: error.message });
     }
 };
+
+// Get all rides for admin dashboard
+exports.getAllRides = async (req, res) => {
+    try {
+        const rides = await Ride.find()
+            .populate('user_id', 'fullname.firstname fullname.lastname email')
+            .populate('joinedUserIds.user', 'fullname.firstname fullname.lastname email')
+            .sort({ createdAt: -1 });
+        
+        res.status(200).json(rides);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch rides", error: error.message });
+    }
+};
+
+// Delete a ride
+exports.deleteRide = async (req, res) => {
+    try {
+        const { rideId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(rideId)) {
+            return res.status(400).json({ message: "Invalid ride ID" });
+        }
+
+        const ride = await Ride.findByIdAndDelete(rideId);
+        
+        if (!ride) {
+            return res.status(404).json({ message: "Ride not found" });
+        }
+
+        res.status(200).json({ message: "Ride deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to delete ride", error: error.message });
+    }
+};
+
+// Get all messages for admin dashboard
+exports.getAllMessages = async (req, res) => {
+    try {
+        const Message = require('../models/message.model');
+        const messages = await Message.find()
+            .populate('sender', 'fullname.firstname fullname.lastname email')
+            .populate('receiver', 'fullname.firstname fullname.lastname email')
+            .sort({ createdAt: -1 });
+        
+        res.status(200).json(messages);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch messages", error: error.message });
+    }
+};
+
+// Delete a message
+exports.deleteMessage = async (req, res) => {
+    try {
+        const { messageId } = req.params;
+        const Message = require('../models/message.model');
+
+        if (!mongoose.Types.ObjectId.isValid(messageId)) {
+            return res.status(400).json({ message: "Invalid message ID" });
+        }
+
+        const message = await Message.findByIdAndDelete(messageId);
+        
+        if (!message) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        res.status(200).json({ message: "Message deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to delete message", error: error.message });
+    }
+};
+
+// Get admin profile
+exports.getAdminProfile = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user._id);
+        
+        // Get admin's average rating
+        const ratings = await Rating.find({ ratedUserId: req.user._id });
+        const averageRating = ratings.length > 0 
+            ? (ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length).toFixed(1)
+            : 0;
+        
+        // Get admin's ride statistics
+        const totalRides = await Ride.countDocuments({ user_id: req.user._id });
+        const completedRides = await Ride.countDocuments({ 
+            user_id: req.user._id, 
+            status: 'closed' 
+        });
+        
+        res.status(200).json({
+            ...user.toObject(),
+            averageRating,
+            totalRides,
+            completedRides,
+            totalRatings: ratings.length
+        });
+    } catch (error) {
+        console.error('Error fetching admin profile:', error);
+        res.status(500).json({ message: 'Failed to fetch admin profile data' });
+    }
+};

@@ -8,7 +8,8 @@ const authMiddleware = require('../middlewares/auth.middleware');
 router.post('/register', [
     body('email').isEmail().withMessage('Invalid Email'),
     body('firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 character'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 character'),   
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 character'),
+    body('role').optional().isIn(['user', 'admin']).withMessage('Role must be either user or admin'),   
 ],
     userController.registerUser
 );
@@ -44,5 +45,11 @@ router.get('/:id', authMiddleware.authUser, userController.getUserById);
 //Delete a user
 router.delete('/:id', authMiddleware.authUser, userController.deleteUser);
 router.get('/admins', authMiddleware.authUser, userController.getAdmins);
+
+// Debug route to check all users - must be before /:id routes
+router.get('/debug/users', userController.debugUsers);
+
+// Test route to create admin user
+router.post('/debug/create-admin', userController.createTestAdmin);
 
 module.exports = router;

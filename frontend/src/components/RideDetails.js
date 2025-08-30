@@ -60,7 +60,7 @@ const RideDetails = ({ ride }) => {
   };
 
   return (
-    <div className="ride-card">
+    <div className="ride-card card-hover">
       <div className="ride-from-to-wrapper">
         <div className="ride-from">
           <strong>{ride.startingPoint}</strong>
@@ -97,7 +97,7 @@ const RideDetails = ({ ride }) => {
 
         <div className="join-section">
           <button
-            className="join-icon"
+            className="join-icon ripple"
             onClick={handleProfileClick}
             title="View Rider Profile"
           >
@@ -105,7 +105,7 @@ const RideDetails = ({ ride }) => {
           </button>
 
           <button
-            className={`join-button ${isJoined ? "joined" : ""}`}
+            className={`join-button ripple ${isJoined ? "joined" : ""}`}
             disabled={!isOpen}
             onClick={toggleJoin}
           >

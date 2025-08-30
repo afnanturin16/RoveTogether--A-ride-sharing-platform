@@ -74,9 +74,9 @@ export default function Home() {
   };
 
   return (
-    <div className="home-wrapper">
+    <div className="home-wrapper fade-in">
       {/* Intro box */}
-      <div className="home-card">
+      <div className="home-card card-hover">
         <div className="home-header">
           <div>
             <h2 className="home-title">Create Your Ride and Find a Travel Buddy!</h2>
@@ -85,13 +85,13 @@ export default function Home() {
             </p>
           </div>
           <Link to="/create">
-            <button className="create-new-post-button">+ Create New Post</button>
+            <button className="create-new-post-button ripple">+ Create New Post</button>
           </Link>
         </div>
       </div>
 
       {/* Search Bar Section */}
-      <form onSubmit={handleSearch} className="search-bar-section">
+      <form onSubmit={handleSearch} className="search-bar-section glass">
         <input
           type="text"
           name="from"
@@ -133,13 +133,15 @@ export default function Home() {
           <option value="Female">Female</option>
           <option value="Both">Male, Female</option>
         </select>
-        <button type="submit" className="search-btn">Search</button>
+        <button type="submit" className="search-btn ripple">Search</button>
       </form>
 
       {/* Ride listing */}
       <div className="ride-list">
-        {rides && rides.map((ride) => (
-          <RideDetails key={ride._id} ride={ride} />
+        {rides && rides.map((ride, index) => (
+          <div key={ride._id} className="slide-in" style={{ animationDelay: `${index * 0.1}s` }}>
+            <RideDetails ride={ride} />
+          </div>
         ))}
       </div>
     </div>
