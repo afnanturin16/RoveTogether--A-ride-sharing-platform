@@ -10,4 +10,4 @@ Overall, the website provides:
 
 3. Robust admin panel to manage users, rides, and content
 
-It’s designed to be simple, secure, and scalable — making RopeTogether a modern solution for community-based ride-sharing.
+It’s designed to be simple, secure, and scalable — making RoveTogether a modern solution for community-based ride-sharing.
